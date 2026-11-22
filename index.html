@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#FFD166">
+    <title>Una buona ragione per alzarti</title>
+    <style>
+        :root {
+            --bg: #FFD166;
+            --ink: #1f1f1f;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        body {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            /* Spazio sicuro per notch e barra di navigazione del telefono */
+            padding:
+                calc(env(safe-area-inset-top, 0px) + 36px)
+                24px
+                calc(env(safe-area-inset-bottom, 0px) + 28px);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--ink);
+            background-color: var(--bg);
+            transition: background-color 0.4s ease;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation; /* niente zoom con il doppio tocco */
+            overflow: hidden;
+        }
+
+        #titolo {
+            margin: 0;
+            font-size: clamp(1rem, 4.6vw, 1.4rem);
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            opacity: 0.75;
+        }
+
+        #ragione {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 18em;
+            font-size: clamp(2rem, 9.5vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            text-wrap: balance;
+            overflow-wrap: break-word;
+        }
+
+        .istruzioni {
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.6;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <p id="titolo">Una buona ragione per alzarti</p>
+    <div id="ragione" aria-live="polite">Tocca lo schermo per iniziare!</div>
+    <div class="istruzioni">Tocca per cambiare</div>
+
+    <script>
+        const ragioni = [
+            "Perché Ciupio deve mangiare",
+            "Perché devi andare in palestra",
+            "Perché Exelab ha bisogno di te",
+            "Perché mi sei mancata li mortacci tua",
+            "Perché qualche parte del mondo deve essere scoperta",
+            "Perché un pokemon deve essere rigiocato",
+            "Perché fallo e basta cazzo",
+            "Perché sennò non ci arrivi a 33 anni",
+            "Perché la sterilizia ha bisogno di te",
+            "Perché, perché no?",
+            "Perché devi pagare le bollette",
+            "Perché tra poco è Natale",
+            "Perché il letto ha bisogno di una pausa",
+            "Perché gallina allettata non fa buon brodo",
+            "Perché chi dorme non pija pesci"
+        ];
+
+        const coloriAllegri = [
+            "#FFD166", // Giallo sole
+            "#06D6A0", // Verde menta
+            "#EF476F", // Rosa fragola
+            "#118AB2", // Blu oceano
+            "#F78C6B", // Arancione pesca
+            "#83D475", // Verde mela
+            "#FF9F1C", // Arancione acceso
+            "#4CC9F0"  // Azzurro cielo
+        ];
+
+        const ragione = document.getElementById('ragione');
+        const metaTema = document.querySelector('meta[name="theme-color"]');
+        const menoMovimento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        let indiceColore = 0;
+
+        // Scelta completamente casuale a ogni tocco (le ripetizioni sono ammesse)
+        function prossimaRagione() {
+            return ragioni[Math.floor(Math.random() * ragioni.length)];
+        }
+
+        function avanti() {
+            ragione.textContent = prossimaRagione();
+
+            // Colore casuale, diverso da quello di prima
+            let nuovo;
+            do {
+                nuovo = Math.floor(Math.random() * coloriAllegri.length);
+            } while (nuovo === indiceColore);
+            indiceColore = nuovo;
+
+            document.documentElement.style.setProperty('--bg', coloriAllegri[indiceColore]);
+            // Colora anche la barra del browser sul telefono
+            metaTema.setAttribute('content', coloriAllegri[indiceColore]);
+
+            // Piccola animazione del testo a ogni tocco
+            if (!menoMovimento.matches && ragione.animate) {
+                ragione.animate(
+                    [
+                        { opacity: 0, transform: 'translateY(16px) scale(0.96)' },
+                        { opacity: 1, transform: 'none' }
+                    ],
+                    { duration: 320, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+                );
+            }
+        }
+
+        document.body.addEventListener('click', avanti);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                avanti();
+            }
+        });
+    </script>
+
+</body>
+</html>
